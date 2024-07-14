@@ -56,6 +56,23 @@ processors.
 
 Please let me know if this is not the case for your machine.
 
+#### CRAN Notes
+
+SIMDe does some pretty fancy footwork with types and there are currently
+a few mismatched types between platform-defined SIMD data types and
+those in SIMDe.
+
+This mismatch leads to some warnings when checking with `clang-asan` and
+`valgrind`.
+
+This means that CRAN probably won’t currently accept a package using
+SIMDe in its current version.
+
+If you were to drop SIMDe and instead write custom SIMD for each
+platform and enable with `#ifdef` statements, then the type errors would
+not occur, and CRAN should accept the package (if there are no other
+issues)
+
 ## CPU ID
 
 Print some basic notes about your CPU and the supported SIMD
@@ -103,10 +120,10 @@ bench::mark(
 
 | expression                     |     min |  median |   itr/sec | mem_alloc |
 |:-------------------------------|--------:|--------:|----------:|----------:|
-| multiply_add_r(a, b, c)        |  6.89µs | 11.97µs |  75494.66 |    89.1KB |
-| multiply_add_c(a, b, c)        | 17.34µs | 20.58µs |  46567.28 |    82.3KB |
-| multiply_add_unrolled(a, b, c) |  6.23µs |  9.68µs |  98185.74 |    82.3KB |
-| multiply_add_simde(a, b, c)    |  4.71µs |   8.2µs | 116947.83 |    82.3KB |
+| multiply_add_r(a, b, c)        |  6.76µs | 11.44µs |  82250.34 |    89.1KB |
+| multiply_add_c(a, b, c)        | 17.38µs |  20.3µs |  46649.50 |    82.3KB |
+| multiply_add_unrolled(a, b, c) |  6.19µs |  9.47µs |  98426.40 |    82.3KB |
+| multiply_add_simde(a, b, c)    |  4.67µs |  8.65µs | 107479.19 |    82.3KB |
 
 ## R and C code implementations
 

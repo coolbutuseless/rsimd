@@ -39,6 +39,7 @@ automatically uses [ARM Neon](https://en.wikipedia.org/wiki/ARM_architecture_fam
 instructions in order to run fast on Mac AArch64 ARM processors.
 
 
+
 ### What's in the box
 
 
@@ -67,6 +68,22 @@ remotes::install_github('coolbutuseless/rsimd')
 The SIMD code should compile and work on both x86 and mac ARM processors.
 
 Please let me know if this is not the case for your machine.
+
+#### CRAN Notes
+
+SIMDe does some pretty fancy footwork with types and there are currently 
+a few mismatched types between platform-defined SIMD data types and 
+those in SIMDe.
+
+This mismatch leads to some warnings when checking with `clang-asan` and
+`valgrind`.
+
+This means that CRAN probably won't currently accept a package using SIMDe
+in its current version.
+
+If you were to drop SIMDe and instead write custom SIMD for each platform and enable with `#ifdef`
+statements, then the type errors would not occur, and CRAN should 
+accept the package (if there are no other issues)
 
 
 
