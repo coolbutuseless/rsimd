@@ -7,3 +7,5 @@
 ^.devcontainer$
 ^man/figures$
 ^\.github$
+^\.positai$
+^\.claude$

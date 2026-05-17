@@ -38,6 +38,7 @@ SIMD instructions in order to run fast on Mac AArch64 ARM processors.
   - `multiply_add_unrolled()` C code in which the inner for-loop is
     unrolled for performance
   - `multiply_add_simde()` C code including AVX512 SIMD instructions
+- Using [SIMDe](https://github.com/simd-everywhere/simde) at 2026-05-17
 
 ## Installation
 
@@ -97,40 +98,50 @@ The following code benchmarks 4 implementations
 
 General findings on my mac ARM M2 CPU
 
-- Plain R implementation is faster than C
-- Unrolled C code is faster than R
-- SIMD code is faster than all
+- Plain R implementation is faster than C for larger sizes
+- Unrolled C code is faster than R (marginally)
+- SIMD code is faster than all (marginally)
 
 ``` r
 library(rsimd)
 
-N <- 10000
+N <- 1000
 a <- runif(N)
 b <- runif(N)
 c <- runif(N)
 
-bench::mark(
+res <- bench::mark(
   multiply_add_r(a, b, c),
   multiply_add_c(a, b, c),
+  multiply_add_fma(a, b, c),
   multiply_add_unrolled(a, b, c),
+  multiply_add_unrolled_fma(a, b, c),
   multiply_add_simde(a, b, c)
-)[, 1:5] |>
+)
+
+res[, 1:5] |>
   knitr::kable()
 ```
 
-| expression                     |     min |  median |   itr/sec | mem_alloc |
-|:-------------------------------|--------:|--------:|----------:|----------:|
-| multiply_add_r(a, b, c)        |  6.76µs | 11.44µs |  82250.34 |    89.1KB |
-| multiply_add_c(a, b, c)        | 17.38µs |  20.3µs |  46649.50 |    82.3KB |
-| multiply_add_unrolled(a, b, c) |  6.19µs |  9.47µs |  98426.40 |    82.3KB |
-| multiply_add_simde(a, b, c)    |  4.67µs |  8.65µs | 107479.19 |    82.3KB |
+| expression                         |      min | median |  itr/sec | mem_alloc |
+|:-----------------------------------|---------:|-------:|---------:|----------:|
+| multiply_add_r(a, b, c)            |   1.84µs | 2.75µs | 335283.7 |    18.8KB |
+| multiply_add_c(a, b, c)            |   2.01µs |  2.3µs | 364518.0 |      12KB |
+| multiply_add_fma(a, b, c)          |   2.01µs | 2.25µs | 384321.6 |      12KB |
+| multiply_add_unrolled(a, b, c)     | 819.91ns | 1.27µs | 593288.9 |      12KB |
+| multiply_add_unrolled_fma(a, b, c) | 820.03ns | 1.15µs | 637947.4 |      12KB |
+| multiply_add_simde(a, b, c)        |    656ns | 1.02µs | 779065.2 |      12KB |
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" alt="" width="100%" />
 
 ## R and C code implementations
 
 #### R code from `R/simd.R`
 
 <details>
+
 <summary>
+
 `multiply_add_r()`
 </summary>
 
@@ -146,7 +157,9 @@ multiply_add_r <- function(a, b, c) {
 #### The following C code sections are from this package `src/simd.c`
 
 <details>
+
 <summary>
+
 `multiply_add_c()`
 </summary>
 
@@ -176,8 +189,11 @@ SEXP multiply_add_c_(SEXP a_, SEXP b_, SEXP c_) {
 ```
 
 </details>
+
 <details>
+
 <summary>
+
 `multiply_add_unrolled()`
 </summary>
 
@@ -218,8 +234,11 @@ SEXP multiply_add_c_(SEXP a_, SEXP b_, SEXP c_) {
     }
 
 </details>
+
 <details>
+
 <summary>
+
 `multiply_add_simde()`
 </summary>
 

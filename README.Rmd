@@ -50,7 +50,7 @@ instructions in order to run fast on Mac AArch64 ARM processors.
     * `multiply_add_c()` Naive C code which does the same operation in C
     * `multiply_add_unrolled()` C code in which the inner for-loop is unrolled for performance
     * `multiply_add_simde()` C code including AVX512 SIMD instructions 
-
+* Using [SIMDe](https://github.com/simd-everywhere/simde) at 2026-05-17
 
 
 ## Installation
@@ -109,26 +109,36 @@ The following code benchmarks 4 implementations
 
 General findings on my mac ARM M2 CPU
 
-* Plain R implementation is faster than C
-* Unrolled C code is faster than R
-* SIMD code is faster than all
+* Plain R implementation is faster than C for larger sizes
+* Unrolled C code is faster than R (marginally)
+* SIMD code is faster than all (marginally)
 
 
 ```{r example}
 library(rsimd)
 
-N <- 10000
+N <- 1000
 a <- runif(N)
 b <- runif(N)
 c <- runif(N)
 
-bench::mark(
+res <- bench::mark(
   multiply_add_r(a, b, c),
   multiply_add_c(a, b, c),
+  multiply_add_fma(a, b, c),
   multiply_add_unrolled(a, b, c),
+  multiply_add_unrolled_fma(a, b, c),
   multiply_add_simde(a, b, c)
-)[, 1:5] |>
+)
+
+res[, 1:5] |>
   knitr::kable()
+```
+
+
+```{r echo=FALSE}
+library(ggplot2)
+plot(res) + theme_bw()
 ```
 
 

@@ -30,8 +30,26 @@ multiply_add_c <- function(a, b, c) {
 #' @rdname multiply_add_r
 #' @export
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+multiply_add_fma <- function(a, b, c) {
+  .Call(multiply_add_fma_, a, b, c)
+}
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#' @rdname multiply_add_r
+#' @export
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 multiply_add_unrolled <- function(a, b, c) {
   .Call(multiply_add_unrolled_, a, b, c)
+}
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#' @rdname multiply_add_r
+#' @export
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+multiply_add_unrolled_fma <- function(a, b, c) {
+  .Call(multiply_add_unrolled_fma_, a, b, c)
 }
 
 
@@ -47,7 +65,7 @@ multiply_add_simde <- function(a, b, c) {
 
 if (FALSE) {
   
-  N <- 1000
+  N <- 1002
   a <- runif(N)
   b <- runif(N)
   c <- runif(N)
@@ -57,8 +75,20 @@ if (FALSE) {
   bench::mark(
     multiply_add_r(a, b, c),
     multiply_add_c(a, b, c),
+    multiply_add_fma(a, b, c),
     multiply_add_unrolled(a, b, c),
+    multiply_add_unrolled_fma(a, b, c),
     multiply_add_simde(a, b, c)
   )
+  
+  
+  multiply_add_r(a, b, c)
+  multiply_add_c(a, b, c)
+  multiply_add_fma(a, b, c)
+  multiply_add_unrolled(a, b, c)
+  multiply_add_unrolled_fma(a, b, c)
+  multiply_add_simde(a, b, c)
+
+  
   
 }

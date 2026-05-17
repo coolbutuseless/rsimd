@@ -2,7 +2,9 @@
 
 export(cpuid)
 export(multiply_add_c)
+export(multiply_add_fma)
 export(multiply_add_r)
 export(multiply_add_simde)
 export(multiply_add_unrolled)
+export(multiply_add_unrolled_fma)
 useDynLib(rsimd, .registration=TRUE)

@@ -3,7 +3,9 @@
 \name{multiply_add_r}
 \alias{multiply_add_r}
 \alias{multiply_add_c}
+\alias{multiply_add_fma}
 \alias{multiply_add_unrolled}
+\alias{multiply_add_unrolled_fma}
 \alias{multiply_add_simde}
 \title{Multiply and add}
 \usage{
@@ -11,7 +13,11 @@ multiply_add_r(a, b, c)
 
 multiply_add_c(a, b, c)
 
+multiply_add_fma(a, b, c)
+
 multiply_add_unrolled(a, b, c)
+
+multiply_add_unrolled_fma(a, b, c)
 
 multiply_add_simde(a, b, c)
 }

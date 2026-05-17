@@ -18,6 +18,33 @@ SEXP multiply_add_c_(SEXP a_, SEXP b_, SEXP c_) {
     error("All arguments must be the same length");
   }
   
+  const double *a = REAL(a_);
+  const double *b = REAL(b_);
+  const double *c = REAL(c_);
+  
+  SEXP res_ = PROTECT(allocVector(REALSXP, length(a_)));
+  double *res = REAL(res_);
+  
+  for (int i = 0; i < length(a_); i++) {
+    res[i] = a[i] * b[i] + c[i];
+  }
+  
+  
+  UNPROTECT(1);
+  return res_;
+}
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SEXP multiply_add_fma_(SEXP a_, SEXP b_, SEXP c_) {
+  
+  if (length(a_) != length(b_) || length(a_) != length(c_)) {
+    error("All arguments must be the same length");
+  }
+  
   
   double *a = REAL(a_);
   double *b = REAL(b_);
@@ -27,7 +54,7 @@ SEXP multiply_add_c_(SEXP a_, SEXP b_, SEXP c_) {
   double *res = REAL(res_);
   
   for (int i = 0; i < length(a_); i++) {
-    res[i] = a[i] * b[i] + c[i];
+    res[i] = fma(a[i], b[i], c[i]);
   }
   
   
@@ -52,22 +79,60 @@ SEXP multiply_add_unrolled_(SEXP a_, SEXP b_, SEXP c_) {
   
   SEXP res_ = PROTECT(allocVector(REALSXP, length(a_)));
   double *res = REAL(res_);
-
+  
 #define UNROLL 8 
   int i = 0;
   for (; i < length(a_) - (UNROLL - 1); i += UNROLL) {
-    *res++ = *a++ * *b++ + *c++;
-    *res++ = *a++ * *b++ + *c++;
-    *res++ = *a++ * *b++ + *c++;
-    *res++ = *a++ * *b++ + *c++;
-    
-    *res++ = *a++ * *b++ + *c++;
-    *res++ = *a++ * *b++ + *c++;
-    *res++ = *a++ * *b++ + *c++;
-    *res++ = *a++ * *b++ + *c++;
+    res[i + 0] = a[i + 0] * b[i + 0] + c[i + 0];
+    res[i + 1] = a[i + 1] * b[i + 1] + c[i + 1];
+    res[i + 2] = a[i + 2] * b[i + 2] + c[i + 2];
+    res[i + 3] = a[i + 3] * b[i + 3] + c[i + 3];
+    res[i + 4] = a[i + 4] * b[i + 4] + c[i + 4];
+    res[i + 5] = a[i + 5] * b[i + 5] + c[i + 5];
+    res[i + 6] = a[i + 6] * b[i + 6] + c[i + 6];
+    res[i + 7] = a[i + 7] * b[i + 7] + c[i + 7];
   }
   for (; i< length(a_); i++) {
     res[i] = a[i] * b[i] + c[i];
+  }
+  
+  
+  UNPROTECT(1);
+  return res_;
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SEXP multiply_add_unrolled_fma_(SEXP a_, SEXP b_, SEXP c_) {
+  
+  if (length(a_) != length(b_) || length(a_) != length(c_)) {
+    error("All arguments must be the same length");
+  }
+  
+  
+  double *a = REAL(a_);
+  double *b = REAL(b_);
+  double *c = REAL(c_);
+  
+  SEXP res_ = PROTECT(allocVector(REALSXP, length(a_)));
+  double *res = REAL(res_);
+  
+#define UNROLL 8 
+  int i = 0;
+  for (; i < length(a_) - (UNROLL - 1); i += UNROLL) {
+    res[i + 0] = fma(a[i + 0], b[i + 0], c[i + 0]);
+    res[i + 1] = fma(a[i + 1], b[i + 1], c[i + 1]);
+    res[i + 2] = fma(a[i + 2], b[i + 2], c[i + 2]);
+    res[i + 3] = fma(a[i + 3], b[i + 3], c[i + 3]);
+    res[i + 4] = fma(a[i + 4], b[i + 4], c[i + 4]);
+    res[i + 5] = fma(a[i + 5], b[i + 5], c[i + 5]);
+    res[i + 6] = fma(a[i + 6], b[i + 6], c[i + 6]);
+    res[i + 7] = fma(a[i + 7], b[i + 7], c[i + 7]);
+  }
+  for (; i< length(a_); i++) {
+    res[i] = fma(a[i], b[i], c[i]);
   }
   
   
